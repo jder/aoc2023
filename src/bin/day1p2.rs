@@ -31,10 +31,7 @@ fn main() {
         let first_digit = substrings.clone().find_map(digit_value).unwrap();
         let last_digit = substrings.clone().rev().find_map(digit_value).unwrap();
 
-        let joined = format!("{}{}", first_digit, last_digit)
-            .parse::<u32>()
-            .unwrap();
-        sum += joined;
+        sum += first_digit * 10 + last_digit;
     }
 
     println!("{sum}")
