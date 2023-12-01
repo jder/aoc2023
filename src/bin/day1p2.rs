@@ -1,11 +1,8 @@
 use std::fs;
 
 fn value(needle: &str) -> Option<u32> {
-    if needle == "" {
-        return None;
-    }
-    if needle.chars().next().unwrap().is_ascii_digit() {
-        return Some(needle.chars().next().unwrap().to_digit(10).unwrap());
+    if let Some(d) = needle.chars().next().and_then(|c| c.to_digit(10)) {
+        return Some(d);
     }
 
     for (value, string) in [
@@ -23,6 +20,7 @@ fn value(needle: &str) -> Option<u32> {
             return Some(value);
         }
     }
+
     None
 }
 
