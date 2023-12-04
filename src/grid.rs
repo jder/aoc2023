@@ -185,7 +185,7 @@ impl<'a, T> Clone for Cell<'a, T> {
 
 impl<'a, T> Copy for Cell<'a, T> {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Region {
     locations: HashSet<Location>,
 }
