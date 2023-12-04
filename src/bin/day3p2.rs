@@ -50,6 +50,7 @@ fn main() {
         cell: &Cell<T>,
         parts: &'a [NumberedRegion],
     ) -> Vec<&'a NumberedRegion> {
+        // We want unique by region but those don't have equality (and hash/ord are hard), so we use indexes.
         let indexes: HashSet<_> = cell
             .neighbors()
             .filter_map(|location| {

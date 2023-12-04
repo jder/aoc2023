@@ -213,8 +213,8 @@ impl Region {
         self.locations
             .iter()
             .flat_map(|location| location.neighbors())
-            .collect::<HashSet<_>>()
-            .into_iter()
             .filter(move |location| !self.locations.contains(location))
+            .collect::<HashSet<_>>() // to make unique
+            .into_iter()
     }
 }
