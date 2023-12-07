@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use rayon::prelude::*;
 use std::fs;
 
 fn main() {
@@ -13,7 +14,10 @@ fn main() {
         .split(" ")
         .filter(|s| !s.is_empty())
         .map(|num| num.parse::<u64>().unwrap())
-        .collect::<Vec<u64>>();
+        .chunks(2)
+        .into_iter()
+        .map(|chunk| chunk.collect_tuple().unwrap())
+        .collect::<Vec<(u64, u64)>>();
 
     let mut mappings = Vec::new(); // ((from, to), Vec<(dest_start, src_start, length)>)
 
@@ -40,22 +44,30 @@ fn main() {
         }
     }
 
-    let mut current = starting_seeds;
-    for (_, this_mapping) in mappings.iter() {
-        let previous_list = current.clone();
-        current.clear();
-        for previous in previous_list.iter() {
-            let mut new = *previous;
-            for (dest_start, src_start, length) in this_mapping.iter() {
-                if previous >= src_start && previous < &(src_start + length) {
-                    let offset = previous - src_start;
-                    new = *dest_start + offset;
-                    break;
+    let mut min = None;
+    for (start, length) in starting_seeds.iter() {
+        println!("{} {}", start, length);
+        let my_min = (*start..(*start + *length))
+            .into_par_iter()
+            .map(|now| {
+                let mut current = now;
+                for (_, this_mapping) in mappings.iter() {
+                    for (dest_start, src_start, length) in this_mapping.iter() {
+                        if current >= *src_start && current < *src_start + length {
+                            let offset = current - src_start;
+                            current = *dest_start + offset;
+                            break;
+                        }
+                    }
                 }
-            }
-            current.push(new);
+                current
+            })
+            .min()
+            .unwrap();
+        if min.is_none() || min.unwrap() > my_min {
+            min = Some(my_min);
         }
     }
 
-    println!("{:?}", current.iter().min().unwrap());
+    println!("{:?}", min);
 }
